@@ -1,0 +1,6 @@
+int a = 69
+float b = 4.20
+float x = a + b
+string s = "hello world"
+# now it gets pretty epic
+print x
