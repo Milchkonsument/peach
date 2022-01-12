@@ -1,111 +1,44 @@
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+#ifndef TOK_HEADER
+#define TOK_HEADER
+	#include "tok.h"
+#endif
+#ifndef LOG_HEADER
+#define LOG_HEADER
+	#include "log.h"
+#endif
 
-enum ttype
-{
-	key_int,
-	key_print,
-	key_float,
-	key_string,
-
-	op_add,
-	op_ass,
-
-	lit_int,
-	lit_float,
-	lit_string,
-
-	identifier,
-	none
-};
-const char *ttype_to_str[9] = {
-	"key:int",
-	"key:print",
-	"key:float",
-	"key:string",
-
-	"opr:add",
-	"opr:ass",
-
-	"lit:int",
-	"lit:float",
-	"lit:string",
-
-	"identif",
-	"-none-"};
-
-typedef struct toklib_el
-{
-	char *lex;
-	enum ttype type;
-} toklib_el;
-
-#define keywords_len 6
-const toklib_el keywords[keywords_len] = {
-	{.lex = "+", .type = op_add},
-	{.lex = "=", .type = op_ass},
-
-	{.lex = "int", .type = key_int},
-	{.lex = "float", .type = key_float},
-	{.lex = "string", .type = key_string},
-	{.lex = "print", .type = key_print}};
-
-int main(int argc, char *argv[]);
-tok *readline(char *line_buffer, int loc, int *cnt);
+tok *readline(char *line_buffer, char *lexeme, int loc, int *cnt);
 enum ttype get_ttype(char *lex, int row, int col);
 enum ttype get_literal_type(char *lex, int row, int col);
 tok *add_token(tok *toks, int *tok_cnt, int row, int col, char *lex);
 int is_number(char *str, int len);
-throw_error_quit(char *lex, int row, int col, char *msg);
 
-int main(int argc, char *argv[])
+void *get_val_by_ttype(enum ttype t, char *lex);
+
+typedef struct toklib_el
 {
-	if (argc < 2)
-	{
-		printf("provide a file");
-		return 1;
-	}
+       char *lex;
+       enum ttype type;
+} toklib_el;
 
-	FILE *f = fopen(argv[1], "r");
-	int buf_len = 255;
-	char buff[buf_len];
-	int loc = 0;
+#define keywords_len 9
+const toklib_el keywords[keywords_len] = {
+       {.lex = "+", .type = op_add},
+       {.lex = "-", .type = op_sub},
+       {.lex = "/", .type = op_div},
+       {.lex = "*", .type = op_mul},
+       {.lex = "::", .type = key_map},
+       {.lex = ":<", .type = key_lfold},
+       {.lex = ":>", .type = key_rfold},
+       {.lex = ":!", .type = key_filter},
+       {.lex = "~", .type = key_avg}};
 
-	if (!f)
-	{
-		printf("could not open file: %s", argv[2]);
-		return 2;
-	}
-
-	while (fgets(buff, buf_len, f))
-	{
-		loc++;
-		if (strlen(buff) == 0 || buff[0] == '\n' || buff[0] == '\0' || buff[0] == '#')
-			continue;
-
-		int cnt = 0;
-		tok *toks = readline(buff, loc, &cnt);
-
-		for (size_t i = 0; i < cnt; i++)
-		{
-			printf("[%02d,%02d] [%s]\t'%s'\n", toks[i].row, toks[i].col, ttype_to_str[toks[i].type], toks[i].val_uncasted);
-		}
-
-		free(toks);
-	}
-
-	free(f);
-}
-
-tok *readline(char *line_buffer, int loc, int *cnt)
+tok *readline(char *line_buffer, char *lexeme, int loc, int *cnt)
 {
 	tok *toks = (tok *)malloc(sizeof(tok));
-	char *lexeme = (char *)malloc(sizeof(char));
 	int cur_lex_start = 0;
 	bool in_stringlit = false;
+	memset(lexeme, 0, strlen(lexeme));
 	
 	for (size_t i = 0; i < strlen(line_buffer); i++)
 	{
@@ -119,7 +52,7 @@ tok *readline(char *line_buffer, int loc, int *cnt)
 			if (strlen(lexeme) != 0)
 			{
 				toks = add_token(toks, cnt, loc, cur_lex_start, lexeme);
-				cur_lex_start = (*cnt) + 1;
+				cur_lex_start = i + 1;
 			}
 
 			continue;
@@ -133,12 +66,11 @@ tok *readline(char *line_buffer, int loc, int *cnt)
 	// clear out lexeme content still left til EOF
 	if (strlen(lexeme) != 0)
 		if(in_stringlit)
-			throw_error_quit(lexeme, loc, cnt, "Error: unclosed string literal.");
+			throw_error_quit(lexeme, loc, cur_lex_start, "Error: unclosed string literal.");
 		else
 			toks = add_token(toks, cnt, loc, cur_lex_start, lexeme);
 
 	free(lexeme);
-
 	return toks;
 }
 
@@ -146,10 +78,36 @@ tok *add_token(tok *toks, int *tok_cnt, int row, int col, char *lex)
 {
 	char *tval = malloc(sizeof(lex));
 	strcpy(tval, lex);
-	toks[*tok_cnt] = (tok){.row = row, .col = col, .type = get_ttype(lex, row, col), .val_uncasted = tval};
+	enum ttype type = get_ttype(lex, row, col);
+	toks[*tok_cnt] = (tok){.col = col, .type = type, .val_uncasted = tval, .val = get_val_by_ttype(type, tval)};
 	(*tok_cnt)++;
 	memset(lex, 0, strlen(lex));
 	return (tok *)realloc(toks, ((*tok_cnt) + 1) * sizeof(tok));
+}
+
+void *get_val_by_ttype(enum ttype t, char *lex) {
+	void *out;
+
+	switch(t) {
+		case lit_int:
+			int cast_i = atoi(lex);
+			out = (void *)&cast_i;
+			break;
+
+		case lit_string:
+			out = lex;
+			break;
+
+		case lit_float:
+			float cast_f = atof(lex);
+			out = (void *)&cast_f;
+			break;
+
+		default:
+			break;
+	};
+
+	return out;
 }
 
 enum ttype get_ttype(char *lex, int row, int col)
@@ -207,9 +165,4 @@ int is_number(char *str, int len) {
 		}
 	}
 	return 1;
-}
-
-throw_error_quit(char *lex, int row, int col, char *msg) {
-	printf("Error at [%i,%i] at '%s': %s", row, col, lex, msg);
-	exit(-1);
 }
