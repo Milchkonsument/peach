@@ -1,3 +1,3 @@
 # peach
 
-Functional-first AWK-like text-processing utility.
+functional AWK-like text processing utility.
