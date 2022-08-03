@@ -9,11 +9,11 @@ namespace PeachInterpreter
     {
         static List<string> cmd_args = new List<string>();
 
-        static readonly Dictionary<String, Tuple<String, Action>> commands = new Dictionary<string, Tuple<string, Action>>() {
-            {"q", new Tuple<String, Action>("quits the session", command_quit)},
-            {"h", new Tuple<String, Action>("prints help", command_help)},
-            {"c", new Tuple<String, Action>("clear screen", command_clear)},
-            {"r", new Tuple<String, Action>("run file (usage: :r *.peach)", run_file)},
+        static readonly Dictionary<string, Tuple<string, Action>> commands = new Dictionary<string, Tuple<string, Action>>() {
+            {"q", new Tuple<string, Action>("quits the session", command_quit)},
+            {"h", new Tuple<string, Action>("prints help", command_help)},
+            {"c", new Tuple<string, Action>("clear screen", command_clear)},
+            {"r", new Tuple<string, Action>("run file (usage: :r *.peach)", run_file)},
         };
 
         static void Main(string[] args)
@@ -28,7 +28,7 @@ namespace PeachInterpreter
             }
         }
 
-        static void eval(String line)
+        static void eval(string line)
         {
             // mach halt
         }
@@ -39,12 +39,12 @@ namespace PeachInterpreter
             for (; ; )
             {
                 Console.Write(">>  ");
-                String ln = Console.ReadLine();
+                string ln = Console.ReadLine();
 
-                if (ln.StartsWith(':'))
+                if (ln.StartsWith(":"))
                 {
-                    String cmd_full = ln.Substring(1);
-                    String[] cmd = cmd_full.Split(' ');
+                    string cmd_full = ln.Substring(1);
+                    string[] cmd = cmd_full.Split(' ');
                     if (cmd.Length > 1)
                         cmd_args = cmd.ToList().GetRange(1, cmd.Length - 1);
                     if (commands.ContainsKey(cmd[0]))
@@ -88,7 +88,7 @@ namespace PeachInterpreter
 
         static void command_help()
         {
-            foreach (KeyValuePair<String, Tuple<String, Action>> item in commands)
+            foreach (KeyValuePair<string, Tuple<string, Action>> item in commands)
             {
                 Console.WriteLine($":{item.Key} | {item.Value.Item1}");
             }

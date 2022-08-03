@@ -16,9 +16,9 @@ namespace PeachInterpreter
         sep,
     }
 
-    class Token<T, TSub> where T : TokenType where TSub : Enum
+    class Token<TSub> where TSub : Enum
     {
-        T type;
+        TokenType type;
         TSub subtype;
         string lexeme;
         CodePosition position;

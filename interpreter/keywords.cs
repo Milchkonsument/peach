@@ -5,7 +5,7 @@ namespace PeachInterpreter
 {
     static class Keywords
     {
-        public readonly Dictionary<String, KeywordType> List = new Dictionary<string, KeywordType>() {
+        public static readonly Dictionary<string, KeywordType> List = new Dictionary<string, KeywordType>() {
             {"if", KeywordType.@if },
             {"else", KeywordType.@else },
             {"for", KeywordType.@for },

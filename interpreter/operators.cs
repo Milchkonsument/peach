@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+using System;
+
 namespace PeachInterpreter
 {
     static class Operators
     {
-        public readonly Dictionary<String, OperatorType> Map = new Dictionary<String, OperatorType>() {
+        public static readonly Dictionary<string, OperatorType> Map = new Dictionary<string, OperatorType>() {
             {"*", OperatorType.star },
             {"/", OperatorType.slash },
             {"+", OperatorType.plus },

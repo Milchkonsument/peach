@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using System;
 
 namespace PeachInterpreter
 {
     static class Seperators
     {
-        public readonly Dictionary<String, SeperatorType> Map = new Dictionary<String, SeperatorType>() {
+        public static readonly Dictionary<string, SeperatorType> Map = new Dictionary<string, SeperatorType>() {
             {";", SeperatorType.semi },
             {",", SeperatorType.comma },
             {"{", SeperatorType.lbrace },
