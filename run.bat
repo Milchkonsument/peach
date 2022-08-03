@@ -1,8 +1,8 @@
 @echo off
 
 pushd build
-csc ..\interpreter\main.cs
-main.exe
+csc -out:peach.exe ..\interpreter\main.cs
+peach.exe
 popd
 
 
