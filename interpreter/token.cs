@@ -1,3 +1,5 @@
+using System;
+
 namespace PeachInterpreter
 {
     enum TokenType
@@ -11,13 +13,13 @@ namespace PeachInterpreter
         // literal
         lit,
         // seperator
-        sep
+        sep,
     }
 
-    class Token<T, TVal> where T : TokenType
+    class Token<T, TSub> where T : TokenType where TSub : Enum
     {
         T type;
-        TVal value;
+        TSub subtype;
         string lexeme;
         CodePosition position;
     }

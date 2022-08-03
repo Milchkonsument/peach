@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
 namespace PeachInterpreter
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-
-    class Interpreter
+    static class Interpreter
     {
         static List<string> cmd_args = new List<string>();
 
@@ -77,6 +77,8 @@ namespace PeachInterpreter
                 Console.WriteLine("Please provide a *.peach file.");
                 return;
             }
+
+            File.ReadAllText(cmd_args[0]);
         }
 
         static void command_quit()

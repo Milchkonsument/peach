@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+
 namespace PeachInterpreter
 {
-    using System;
-    using System.Collections.Generic;
-
     static class Keywords
     {
-        public readonly Dictionary<String, KeywordType> List = {
+        public readonly Dictionary<String, KeywordType> List = new Dictionary<string, KeywordType>() {
             {"if", KeywordType.@if },
             {"else", KeywordType.@else },
             {"for", KeywordType.@for },
