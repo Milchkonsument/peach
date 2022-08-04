@@ -2,7 +2,7 @@ using System;
 
 namespace PeachInterpreter
 {
-    enum TokenType
+    public enum TokenType
     {
         // keyword
         key,
@@ -16,7 +16,7 @@ namespace PeachInterpreter
         sep,
     }
 
-    class Token<TSub> where TSub : Enum
+    public class Token<TSub> where TSub : Enum
     {
         TokenType type;
         TSub subtype;
@@ -24,9 +24,9 @@ namespace PeachInterpreter
         CodePosition position;
     }
 
-    struct CodePosition
+    public struct CodePosition
     {
-        int line;
-        int column;
+        public int line;
+        public int column;
     }
 }

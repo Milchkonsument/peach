@@ -1,21 +1,41 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace PeachInterpreter
 {
-    static class Lexer
+    public class Lexer
     {
-        private static string _lex_buf;
+        private string _lexeme;
+        private CodePosition _pos;
 
-        public static List<Token<TokenType, Enum>> tokenize(List<String> l)
+        private List<Token<Enum>> _tokens;
+
+        public List<Token<Enum>> Tokens => _tokens;
+        
+        public Lexer()
         {
-            init();
-
+            _lexeme = string.Empty;
+            _tokens = new List<Token<Enum>>();
         }
 
-        private static void init()
+        public static Lexer tokenize(List<String> l)
         {
-            _lex_buf = string.Empty;
+            Lexer lexer = new Lexer();
+            foreach(string line in l)
+            {
+                lexer._pos.line++;
+                lexer._pos.column = 0;
+                for(int i = 0; i < line.Length; i++)
+                {
+                    lexer._pos.column++;
+
+                    Action parse = line[i] switch
+                    {
+                        _ => throw new NotImplementedException(),
+                    };
+                }
+            }
+            return lexer;
         }
     }
 }
