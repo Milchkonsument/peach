@@ -32,7 +32,7 @@ namespace PeachInterpreter
         public string lexeme;
         public CodePosition position;
 
-        public override string ToString() => $"{position}\t|\t{type}\t|\t{subtype}\t|\t{lexeme}";
+        public override string ToString() => $"{position}\t{type}\t|\t{subtype}\t|\t{lexeme}";
     }
 
     public struct CodePosition
