@@ -67,18 +67,36 @@ namespace PeachInterpreter
 
             if (!File.Exists(cmd_args[0]))
             {
-
                 Console.WriteLine("File does not exist.");
                 return;
             }
 
-            if (cmd_args[0].EndsWith(".peach"))
+            if (!cmd_args[0].Trim().EndsWith(".peach"))
             {
                 Console.WriteLine("Please provide a *.peach file.");
                 return;
             }
 
-            File.ReadAllText(cmd_args[0]);
+            eval(File.ReadAllLines(cmd_args[0]));
+        }
+
+        static void eval(string[] code)
+        {
+            Lexer ben = Lexer.tokenize(code.ToList());
+
+            if (ben.had_error)
+            {
+                foreach (var err in ben.error)
+                {
+                    Console.WriteLine(err);
+                }
+            }
+
+            Console.WriteLine("+++ DUMP +++");
+            foreach (var token in ben.Tokens)
+            {
+                Console.WriteLine(token);
+            }
         }
 
         static void command_quit()

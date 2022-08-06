@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace PeachInterpreter
 {
@@ -16,17 +17,35 @@ namespace PeachInterpreter
         sep,
     }
 
-    public class Token<TSub> where TSub : Enum
+    public class Token<TSub>
     {
-        TokenType type;
-        TSub subtype;
-        string lexeme;
-        CodePosition position;
+        public Token(TokenType type, TSub subtype, string lexeme, CodePosition start)
+        {
+            this.type = type;
+            this.subtype = subtype;
+            this.lexeme = lexeme;
+            this.position = start;
+        }
+
+        public TokenType type;
+        public TSub subtype;
+        public string lexeme;
+        public CodePosition position;
+
+        public override string ToString() => $"{position}\t|\t{type}\t|\t{subtype}\t|\t{lexeme}";
     }
 
     public struct CodePosition
     {
+        public CodePosition(int line, int column)
+        {
+            this.line = line;
+            this.column = column;
+        }
+
         public int line;
         public int column;
+
+        public override string ToString() => $"[{line + 1}, {column + 1}]";
     }
 }
