@@ -2,7 +2,7 @@ string hallo = "Buenas, que tal?"
 
 string s = arr[123++]
 
-double d = .45
+~double mutable_double = .45
 
 bool ist_julian_cool = !false
 

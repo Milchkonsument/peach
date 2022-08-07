@@ -121,6 +121,9 @@ namespace PeachInterpreter
                 case ('!'):
                     add_token(TokenType.oper, current_maybe_next('=') ? OperatorType.neq : OperatorType.not);
                     return;
+                case ('~'):
+                    add_token(TokenType.oper, OperatorType.mut);
+                    return;
             }
 
             // process seperators

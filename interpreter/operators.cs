@@ -17,6 +17,11 @@ namespace PeachInterpreter
             {"--", OperatorType.mnmn },
             {"!", OperatorType.not },
             {"!=", OperatorType.neq },
+            {"<", OperatorType.lt },
+            {">", OperatorType.gt },
+            {"<=", OperatorType.lteq },
+            {">=", OperatorType.gteq },
+            {"~", OperatorType.mut },
         };
     }
 
@@ -33,5 +38,10 @@ namespace PeachInterpreter
         mnmn,
         not,
         neq,
+        lt,
+        gt,
+        lteq,
+        gteq,
+        mut,
     }
 }
