@@ -46,6 +46,6 @@ namespace PeachInterpreter
         public int line;
         public int column;
 
-        public override string ToString() => $"[{line + 1}, {column + 1}]";
+        public override string ToString() => $"[{line + 1:D3}, {column + 1:D3}]";
     }
 }

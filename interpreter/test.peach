@@ -1,13 +1,13 @@
 string hallo = "Buenas, que tal?"
 
-123
+string s = arr[123++]
 
 double d = .45
 
-"lolol 123 <?><A:DWKA{Fok} \"ESCAPE STRING\" :D "
+bool ist_julian_cool = !false
+
+"lolol <?A:DWKA{Fok} \" STRING\""
 
 lolol = "lol"
 
 geheimnis = 12 * (3+4)
-
-"Feapofksefok- k 0

@@ -48,11 +48,8 @@ namespace PeachInterpreter
             Lexer lexer = new Lexer();
             lexer._buffer = l;
 
-            foreach (string line in l.Select((s) => s.Trim()))
+            foreach (string line in l)
             {
-                if (line.Length == 0)
-                    continue;
-
                 lexer.tokenize_line();
                 lexer._pos.line++;
             }
@@ -110,19 +107,19 @@ namespace PeachInterpreter
                     add_token(TokenType.oper, OperatorType.slash);
                     return;
                 case ('+'):
-                    add_token(TokenType.oper, peek_maybe_next('+') ? OperatorType.plusplus : OperatorType.plus);
+                    add_token(TokenType.oper, current_maybe_next('+') ? OperatorType.plpl : OperatorType.plus);
                     return;
                 case ('-'):
-                    add_token(TokenType.oper, peek_maybe_next('-') ? OperatorType.minmin : OperatorType.minus);
+                    add_token(TokenType.oper, current_maybe_next('-') ? OperatorType.mnmn : OperatorType.minus);
                     return;
                 case ('%'):
                     add_token(TokenType.oper, OperatorType.slash);
                     return;
                 case ('='):
-                    add_token(TokenType.oper, peek_maybe_next('=') ? OperatorType.eqeq : OperatorType.eq);
+                    add_token(TokenType.oper, current_maybe_next('=') ? OperatorType.eqeq : OperatorType.eq);
                     return;
                 case ('!'):
-                    add_token(TokenType.oper, peek_maybe_next('=') ? OperatorType.neq : OperatorType.not);
+                    add_token(TokenType.oper, current_maybe_next('=') ? OperatorType.neq : OperatorType.not);
                     return;
             }
 
@@ -165,7 +162,7 @@ namespace PeachInterpreter
             {
                 next();
                 next();
-                add_token(TokenType.lit, LiteralType.@string);
+                add_token(TokenType.lit, LiteralType.@char);
                 return;
             }
 
@@ -173,7 +170,7 @@ namespace PeachInterpreter
             if (peek(1) == '\'')
             {
                 next();
-                add_token(TokenType.lit, LiteralType.@string);
+                add_token(TokenType.lit, LiteralType.@char);
                 return;
             }
 
@@ -255,8 +252,8 @@ namespace PeachInterpreter
 
         bool at_end() => current() == '\0';
 
-        // peeks the next character and consumes if it matches
-        bool peek_maybe_next(char c) => peek() == c ? _pos.column++ == _pos.column : false;
+        // peeks the current character and consumes if it matches
+        bool current_maybe_next(char c) => current() == c ? ++_pos.column == _pos.column : false;
 
         private bool is_keyword(string lexeme) => Keywords.Map.ContainsKey(lexeme);
 

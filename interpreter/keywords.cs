@@ -16,6 +16,9 @@ namespace PeachInterpreter
             {"double", KeywordType.@double },
             {"string", KeywordType.@string },
             {"struct", KeywordType.@struct },
+            {"true", KeywordType.@true },
+            {"false", KeywordType.@false },
+            {"bool", KeywordType.@bool },
         };
     }
 
@@ -31,5 +34,8 @@ namespace PeachInterpreter
         @double,
         @string,
         @struct,
+        @true,
+        @false,
+        @bool,
     }
 }

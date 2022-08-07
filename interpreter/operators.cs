@@ -13,8 +13,8 @@ namespace PeachInterpreter
             {"%", OperatorType.perc },
             {"=", OperatorType.eq },
             {"==", OperatorType.eqeq },
-            {"++", OperatorType.plusplus },
-            {"--", OperatorType.minmin },
+            {"++", OperatorType.plpl },
+            {"--", OperatorType.mnmn },
             {"!", OperatorType.not },
             {"!=", OperatorType.neq },
         };
@@ -29,8 +29,8 @@ namespace PeachInterpreter
         perc,
         eq,
         eqeq,
-        plusplus,
-        minmin,
+        plpl,
+        mnmn,
         not,
         neq,
     }
