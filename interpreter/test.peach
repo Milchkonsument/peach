@@ -8,6 +8,30 @@ bool ist_julian_cool = !false
 
 "lolol <?A:DWKA{Fok} \" STRING\""
 
-lolol = "lol"
+int geheimnis = 12 * (3+4)
 
-geheimnis = 12 * (3+4)
+if geheimnis == mutable_double {
+    print "uh oh."
+} else {
+    print "ok cool"
+}
+
+struct _mit_unterstrich_vorne_1337 {
+    int id
+    string title
+    ~string description
+    position pos
+}
+
+struct position {
+    double x
+    double y
+}
+
+fn funky_func int {
+    return 42
+}
+
+fn extra_funky_func(string a, string b) int {
+    return 420
+}

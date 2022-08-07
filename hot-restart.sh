@@ -9,6 +9,6 @@ cd interpreter
 while true; do
 	
 	echo ""
-	inotifywait -q --event close_write --format '%w ---' $FLIST | xargs echo "--- CHANGED:" && echo "--- HOT RESTARTING ---" && echo "" && mcs -out:peach $FLIST && mono peach test.peach
+	inotifywait -q --event close_write --format '%w ---' $FLIST | xargs echo "--- CHANGED:" && echo "--- HOT RESTARTING ---" && echo "" && mcs -out:peach $FLIST && time mono peach test.peach
 
 done

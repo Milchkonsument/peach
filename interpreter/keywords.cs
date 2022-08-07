@@ -19,6 +19,7 @@ namespace PeachInterpreter
             {"true", KeywordType.@true },
             {"false", KeywordType.@false },
             {"bool", KeywordType.@bool },
+            {"print", KeywordType.@print },
         };
     }
 
@@ -37,5 +38,6 @@ namespace PeachInterpreter
         @true,
         @false,
         @bool,
+        @print,
     }
 }
