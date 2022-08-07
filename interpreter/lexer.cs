@@ -22,7 +22,7 @@ namespace PeachInterpreter
 
     public class Lexer
     {
-        private string lexeme => currentLine.Substring(_lexemeStart, _pos.column - 1 - _lexemeStart);
+        private string lexeme => currentLine.Substring(_lexemeStart, _pos.column - _lexemeStart);
 
         private CodePosition _pos;
 
@@ -69,7 +69,7 @@ namespace PeachInterpreter
 
                 _lexemeStart = _pos.column;
 
-                char c = next();
+                char c = current();
                 if (c == '\"')
                 {
                     process_string();
@@ -80,7 +80,7 @@ namespace PeachInterpreter
                     process_char();
                 }
 
-                else if (char.IsDigit(c))
+                else if (char.IsDigit(c) || c == '.')
                 {
                     process_num();
                 }
@@ -99,8 +99,7 @@ namespace PeachInterpreter
 
         private void process_other()
         {
-            char c = peek(-1);
-
+            char c = next();
             // process operators
             switch (c)
             {
@@ -111,23 +110,19 @@ namespace PeachInterpreter
                     add_token(TokenType.oper, OperatorType.slash);
                     return;
                 case ('+'):
-                    add_token(TokenType.oper, current() == '+' ? OperatorType.plusplus : OperatorType.plus);
-                    next();
+                    add_token(TokenType.oper, peek_maybe_next('+') ? OperatorType.plusplus : OperatorType.plus);
                     return;
                 case ('-'):
-                    add_token(TokenType.oper, current() == '-' ? OperatorType.minmin : OperatorType.minus);
-                    next();
+                    add_token(TokenType.oper, peek_maybe_next('-') ? OperatorType.minmin : OperatorType.minus);
                     return;
                 case ('%'):
                     add_token(TokenType.oper, OperatorType.slash);
                     return;
                 case ('='):
-                    add_token(TokenType.oper, current() == '=' ? OperatorType.eqeq : OperatorType.eq);
-                    next();
+                    add_token(TokenType.oper, peek_maybe_next('=') ? OperatorType.eqeq : OperatorType.eq);
                     return;
                 case ('!'):
-                    add_token(TokenType.oper, current() == '=' ? OperatorType.neq : OperatorType.not);
-                    next();
+                    add_token(TokenType.oper, peek_maybe_next('=') ? OperatorType.neq : OperatorType.not);
                     return;
             }
 
@@ -143,13 +138,15 @@ namespace PeachInterpreter
 
         private void process_string()
         {
+            next(); // consume the first double quotes
+
             while (!at_end())
             {
                 char c = next();
 
-                if (peek(-1) != '\\' && c == '"')
+                if (c == '"' && peek(-2) != '\\')
                 {
-                    maybe_next();
+                    // maybe_next();
                     add_token(TokenType.lit, LiteralType.@string);
                     return;
                 }
@@ -158,9 +155,9 @@ namespace PeachInterpreter
             throw_error("Encountered non-terminated string literal.");
         }
 
-
         private void process_char()
         {
+            next();
             char c = next();
 
             // char has escaped symbol
@@ -190,7 +187,6 @@ namespace PeachInterpreter
             while (!current_terminating())
             {
                 char c = next();
-                Console.WriteLine($"procnum {c}");
 
                 if (!char.IsNumber(c) && c != '.')
                 {
@@ -221,21 +217,18 @@ namespace PeachInterpreter
 
         private void process_iden_or_keyword()
         {
-            while (!at_end())
+            while (!current_terminating() && (char.IsLetterOrDigit(current()) || current() == '_'))
             {
-                char c = next();
-                if (!char.IsLetterOrDigit(c) && c != '_')
-                {
-                    if (is_keyword(lexeme))
-                    {
-                        add_token(TokenType.key, Keywords.Map[lexeme]);
-                    }
-                    else
-                    {
-                        add_token<object>(TokenType.iden, null);
-                    }
-                    break;
-                }
+                next();
+            }
+
+            if (is_keyword(lexeme))
+            {
+                add_token(TokenType.key, Keywords.Map[lexeme]);
+            }
+            else
+            {
+                add_token<object>(TokenType.iden, null);
             }
         }
 
@@ -244,19 +237,23 @@ namespace PeachInterpreter
         // returns whether the current char is a char that would terminate the current lexeme
         bool current_terminating() => at_end() || char.IsWhiteSpace(current()) || is_seperator(current()) || is_operator(current());
 
-        char peek() => currentLine[_pos.column + 1];
+        char peek() => peek(1);
 
-        char peek(int n) => currentLine[_pos.column + n];
+        char peek(int n) => _pos.column + n > currentLine.Length - 1 ? '\0' : currentLine[_pos.column + n];
 
         // returns the current char under pointer
         char current() => peek(0);
 
         // consumes and returns current()
-        char next() => currentLine[_pos.column++];
+        char next()
+        {
+            // Console.Write($"{currentLine[_pos.column]}");
+            return currentLine[_pos.column++];
+        }
 
         void maybe_next() => _pos.column += at_end() ? 0 : 1;
 
-        bool at_end() => _pos.column >= currentLine.Length - 1;
+        bool at_end() => current() == '\0';
 
         // peeks the next character and consumes if it matches
         bool peek_maybe_next(char c) => peek() == c ? _pos.column++ == _pos.column : false;
@@ -275,5 +272,7 @@ namespace PeachInterpreter
         }
 
         private void throw_error(String msg) => error.Add(new Error(msg, new CodePosition(_pos.line, _lexemeStart), Tokens.Count == 0 ? "" : Tokens.Last().lexeme));
+
+        private void log(String msg) => Console.WriteLine(msg);
     }
 }

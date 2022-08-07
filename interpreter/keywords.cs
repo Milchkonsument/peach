@@ -13,6 +13,7 @@ namespace PeachInterpreter
             {"return", KeywordType.@return },
             {"int", KeywordType.@int },
             {"float", KeywordType.@float },
+            {"double", KeywordType.@double },
             {"string", KeywordType.@string },
             {"struct", KeywordType.@struct },
         };
@@ -27,6 +28,7 @@ namespace PeachInterpreter
         @return,
         @int,
         @float,
+        @double,
         @string,
         @struct,
     }

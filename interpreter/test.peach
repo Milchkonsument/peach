@@ -2,6 +2,8 @@ string hallo = "Buenas, que tal?"
 
 123
 
+double d = .45
+
 "lolol 123 <?><A:DWKA{Fok} \"ESCAPE STRING\" :D "
 
 lolol = "lol"
