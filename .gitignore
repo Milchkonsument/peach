@@ -21,6 +21,7 @@ x64/
 [Oo]bj/
 
 *.exe
+*.history
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
