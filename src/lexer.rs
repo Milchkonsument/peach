@@ -31,6 +31,7 @@ impl<'a> Lexer<'a> {
         while self.lines.get(self.position.row).is_some() {
             while let Some(ch) = self.next() {
                 match ch {
+                    '#' => break,
                     '+' => self.add(TokenBody::Opr(Opr::Add)),
                     '-' => self.add(TokenBody::Opr(Opr::Sub)),
                     '*' => self.add(TokenBody::Opr(Opr::Mul)),

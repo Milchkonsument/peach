@@ -84,9 +84,9 @@ fn interpret(lines: Vec<&str>) {
         println!("{}", pretty_printer.print(&expr))
     }
 
-    // for expr in &exprs {
-    //     println!("{:?}", interpreter.eval(expr))
-    // }
+    for expr in &exprs {
+        println!("{:?}", interpreter.eval(expr))
+    }
 
     println!(
         "\n[ took {}ms ]",
