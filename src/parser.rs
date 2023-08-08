@@ -54,92 +54,131 @@ impl Parser {
         let t = self.next().unwrap();
 
         let expr = match t.clone().body {
-            TokenBody::Lit(_) | TokenBody::Idn => match self.peek().is_some() {
-                true => match self.peek().unwrap().body {
-                    TokenBody::Opr(opr) => match opr {
-                        Opr::Add => {
-                            self.next();
-                            Expr::Add(Box::new(Expr::Lit(t)), Box::new(self.exp()))
-                        }
-                        Opr::Sub => {
-                            self.next();
-                            Expr::Sub(Box::new(Expr::Lit(t)), Box::new(self.exp()))
-                        }
-                        Opr::Mul => {
-                            self.next();
-                            Expr::Mul(Box::new(Expr::Lit(t)), Box::new(self.exp()))
-                        }
-                        Opr::Div => {
-                            self.next();
-                            Expr::Div(Box::new(Expr::Lit(t)), Box::new(self.exp()))
-                        }
-                        _ => self.err("cannot assign to literal".to_owned()),
-                    },
-                    _ => Expr::Lit(t),
-                },
-                false => Expr::Lit(t),
-            },
-            TokenBody::Opr(opr) => match opr {
-                Opr::Add | Opr::Sub => Expr::Sign(t, Box::new(self.exp())),
-                _ => self.err("unsupported prefix operator".to_owned()),
-            },
-            TokenBody::Sep(sep) => match sep {
-                Sep::LBrace => {
-                    let exp = self.exp();
-                    match self
-                        .next()
-                        .is_some_and(|t| t.body == TokenBody::Sep(Sep::RBrace))
-                    {
-                        true => Expr::Grp(Box::new(exp)),
-                        false => self.err("missing closing brace".to_owned()),
-                    }
-                }
-                Sep::RBrace => self.err("missing opening brace".to_owned()),
-            },
-            TokenBody::Key(k) => match k {
-                Key::Print => match self.peek().is_some() {
-                    true => Expr::Print(Box::new(self.exp())),
-                    false => self.err("expected expression to print".to_owned()),
-                },
-                Key::Let => {
-                    let iden = self.next();
-                    let eq = self.next();
-
-                    match iden
-                        .clone()
-                        .is_some_and(|t| matches!(t.body, TokenBody::Idn))
-                        && eq.is_some_and(|t| matches!(t.body, TokenBody::Opr(Opr::Ass)))
-                    {
-                        true => Expr::Let(iden.unwrap(), Box::new(self.exp())),
-                        false => self.err("expected valid assignment".to_owned()),
-                    }
-                }
-                Key::LetMut => {
-                    let iden = self.next();
-                    let eq = self.next();
-
-                    match iden
-                        .clone()
-                        .is_some_and(|t| matches!(t.body, TokenBody::Idn))
-                        && eq.is_some_and(|t| matches!(t.body, TokenBody::Opr(Opr::Ass)))
-                    {
-                        true => Expr::Let(iden.unwrap(), Box::new(self.exp())),
-                        false => self.err("expected valid assignment".to_owned()),
-                    }
-                }
-            },
-            TokenBody::Idn => match self.next() {
-                Some(t) => match t {},
-                None => todo!(),
-                // true => match self.peek().is_some() {
-                //     true => Expr::Ass(eq.unwrap(), Box::new(self.exp())),
-                //     false => self.err("exprected expression to assign".to_owned()),
-                // },
-                // false => self.err("expected assignmen to variable".to_owned()),
-            },
+            TokenBody::Lit(_) => self.lit(t),
+            TokenBody::Opr(opr) => self.opr(opr, t),
+            TokenBody::Sep(sep) => self.sep(sep),
+            TokenBody::Key(key) => self.key(key),
+            TokenBody::Idn => self.idn(t),
         };
 
         expr
+    }
+
+    fn idn(&mut self, t: Token) -> Expr {
+        match self.peek().is_some() {
+            true => match self.peek().unwrap().body {
+                TokenBody::Opr(opr) => match opr {
+                    Opr::Add => {
+                        self.next();
+                        Expr::Add(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    Opr::Sub => {
+                        self.next();
+                        Expr::Sub(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    Opr::Mul => {
+                        self.next();
+                        Expr::Mul(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    Opr::Div => {
+                        self.next();
+                        Expr::Div(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    Opr::Ass => {
+                        self.next();
+                        Expr::Ass(t, Box::new(self.exp()))
+                    } // _ => self.err("unexpected token".to_owned()),
+                },
+                _ => Expr::Lit(t),
+            },
+            false => Expr::Lit(t),
+        }
+    }
+
+    fn key(&mut self, k: Key) -> Expr {
+        match k {
+            Key::Print => match self.peek().is_some() {
+                true => Expr::Print(Box::new(self.exp())),
+                false => self.err("expected expression to print".to_owned()),
+            },
+            Key::Let => {
+                let iden = self.next();
+                let eq = self.next();
+
+                match iden
+                    .clone()
+                    .is_some_and(|t| matches!(t.body, TokenBody::Idn))
+                    && eq.is_some_and(|t| matches!(t.body, TokenBody::Opr(Opr::Ass)))
+                {
+                    true => Expr::Let(iden.unwrap(), Box::new(self.exp())),
+                    false => self.err("expected valid assignment".to_owned()),
+                }
+            }
+            Key::LetMut => {
+                let iden = self.next();
+                let eq = self.next();
+
+                match iden
+                    .clone()
+                    .is_some_and(|t| matches!(t.body, TokenBody::Idn))
+                    && eq.is_some_and(|t| matches!(t.body, TokenBody::Opr(Opr::Ass)))
+                {
+                    true => Expr::Let(iden.unwrap(), Box::new(self.exp())),
+                    false => self.err("expected valid assignment".to_owned()),
+                }
+            }
+        }
+    }
+
+    fn sep(&mut self, sep: Sep) -> Expr {
+        match sep {
+            Sep::LBrace => {
+                let exp = self.exp();
+                match self
+                    .next()
+                    .is_some_and(|t| t.body == TokenBody::Sep(Sep::RBrace))
+                {
+                    true => Expr::Grp(Box::new(exp)),
+                    false => self.err("missing closing brace".to_owned()),
+                }
+            }
+            Sep::RBrace => self.err("missing opening brace".to_owned()),
+        }
+    }
+
+    fn opr(&mut self, opr: Opr, t: Token) -> Expr {
+        match opr {
+            Opr::Add | Opr::Sub => Expr::Sign(t, Box::new(self.exp())),
+            _ => self.err("unsupported prefix operator".to_owned()),
+        }
+    }
+
+    fn lit(&mut self, t: Token) -> Expr {
+        match self.peek().is_some() {
+            true => match self.peek().unwrap().body {
+                TokenBody::Opr(opr) => match opr {
+                    Opr::Add => {
+                        self.next();
+                        Expr::Add(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    Opr::Sub => {
+                        self.next();
+                        Expr::Sub(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    Opr::Mul => {
+                        self.next();
+                        Expr::Mul(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    Opr::Div => {
+                        self.next();
+                        Expr::Div(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+                    }
+                    _ => self.err("cannot assign to literal".to_owned()),
+                },
+                _ => Expr::Lit(t),
+            },
+            false => Expr::Lit(t),
+        }
     }
 
     pub fn drain(&mut self) -> (Vec<Expr>, Vec<InterpreterError>) {
