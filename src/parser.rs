@@ -66,31 +66,20 @@ impl Parser {
 
     fn idn(&mut self, t: Token) -> Expr {
         match self.peek().is_some() {
-            true => match self.peek().unwrap().body {
-                TokenBody::Opr(opr) => match opr {
-                    Opr::Add => {
-                        self.next();
-                        Expr::Add(Box::new(Expr::Lit(t)), Box::new(self.exp()))
+            true => {
+                if let Some(TokenBody::Opr(opr)) = self.peek().and_then(|t| Some(t.body)) {
+                    self.next();
+                    match opr {
+                        Opr::Add => Expr::Add(Box::new(Expr::Lit(t)), Box::new(self.exp())),
+                        Opr::Sub => Expr::Sub(Box::new(Expr::Lit(t)), Box::new(self.exp())),
+                        Opr::Mul => Expr::Mul(Box::new(Expr::Lit(t)), Box::new(self.exp())),
+                        Opr::Div => Expr::Div(Box::new(Expr::Lit(t)), Box::new(self.exp())),
+                        Opr::Ass => Expr::Ass(t, Box::new(self.exp())), // _ => self.err("unexpected token".to_owned()),
                     }
-                    Opr::Sub => {
-                        self.next();
-                        Expr::Sub(Box::new(Expr::Lit(t)), Box::new(self.exp()))
-                    }
-                    Opr::Mul => {
-                        self.next();
-                        Expr::Mul(Box::new(Expr::Lit(t)), Box::new(self.exp()))
-                    }
-                    Opr::Div => {
-                        self.next();
-                        Expr::Div(Box::new(Expr::Lit(t)), Box::new(self.exp()))
-                    }
-                    Opr::Ass => {
-                        self.next();
-                        Expr::Ass(t, Box::new(self.exp()))
-                    } // _ => self.err("unexpected token".to_owned()),
-                },
-                _ => Expr::Lit(t),
-            },
+                } else {
+                    Expr::Lit(t)
+                }
+            }
             false => Expr::Lit(t),
         }
     }

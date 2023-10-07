@@ -10,7 +10,10 @@ impl Display for InterpreterError {
         write!(
             f,
             "[{},{}] at '{}': {}",
-            self.0.row, self.0.col, self.1, self.2
+            self.0.row + 1,
+            self.0.col,
+            self.1,
+            self.2
         )
     }
 }

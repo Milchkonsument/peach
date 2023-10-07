@@ -1,4 +1,6 @@
-use std::{env, fs};
+#![feature(result_option_inspect)]
+
+use std::{env, fs, io::stdin};
 
 use chrono::Local;
 use lexer::Lexer;
@@ -19,12 +21,10 @@ mod types;
 
 fn main() {
     let args = env::args().collect::<Vec<_>>();
-
     let path = args.get(1);
 
     if path.is_none() {
-        println!("usage: peach source.peach");
-        return;
+        repl();
     }
 
     let path = path.unwrap();
@@ -35,13 +35,15 @@ fn main() {
     }
 }
 
-fn interpret(lines: Vec<&str>) {
-    for line in &lines {
-        println!("{line}")
+fn repl() -> ! {
+    let mut buf = String::new();
+    loop {
+        _ = stdin().read_line(&mut buf);
+        interpret(vec![buf.as_ref()]);
     }
+}
 
-    println!();
-
+fn interpret(lines: Vec<&str>) {
     let start_time = Local::now();
 
     let mut lexer = Lexer::new();
@@ -53,12 +55,12 @@ fn interpret(lines: Vec<&str>) {
 
     let (tokens, errors) = lexer.drain();
 
-    for tok in &tokens {
-        for t in tok {
-            println!("{:?}", t)
-        }
-        println!()
-    }
+    // for tok in &tokens {
+    //     for t in tok {
+    //         println!("{:?}", t)
+    //     }
+    //     println!()
+    // }
 
     for err in &errors {
         eprintln!("{}", err)

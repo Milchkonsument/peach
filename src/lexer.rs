@@ -101,7 +101,6 @@ impl<'a> Lexer<'a> {
             }
             
             self.tokens.push(vec![]);
-
             self.position.linebreak();
             self.lexeme_start.linebreak();
         }
